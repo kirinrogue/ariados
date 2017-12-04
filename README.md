@@ -2,6 +2,7 @@
 - Red social para Pokémon GO
 
 Tecnologías:
+
     · Server side:
         * Python 3.6
         * Django 1.11.5
