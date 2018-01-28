@@ -2,6 +2,10 @@
 import json
 
 from django.contrib.auth import logout
+from django.contrib.auth.models import User
+from rest_framework import permissions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
 
 from .serializers import UserSerializer
 from .utiles import *
@@ -31,3 +35,11 @@ def handle_login(request):
 def handle_logout(request):
     logout(request)
     return json.dumps({'status': 'VALID', 'message': 'Successfully logged out.'})
+
+
+@api_view(['GET', ])
+@permission_classes((permissions.AllowAny,))
+def show_users(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
