@@ -7,6 +7,8 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
+from rest_framework import authentication
+
 from .serializers import UserSerializer
 from .utiles import *
 
@@ -43,3 +45,14 @@ def show_users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
+
+
+# @api_view(['GET'])
+# @authentication_classes((SessionAuthentication, BasicAuthentication))
+# @permission_classes((IsAuthenticated,))
+# def example_view(request, format=None):
+#     content = {
+#         'user': unicode(request.user),  # `django.contrib.auth.User` instance.
+#         'auth': unicode(request.auth),  # None
+#     }
+#     return Response(content)
