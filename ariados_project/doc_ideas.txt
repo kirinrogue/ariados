@@ -1,0 +1,4 @@
+# Ideas para la documentación:
+
+* Documentar la evolución del modelo a partir del original y las migraciones (explicando evolución).
+* Hablar sobre la variedad de tecnologías usadas, explicándolas y mostrando su función en cada parte del proyecto.

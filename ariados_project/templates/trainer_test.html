@@ -1,0 +1,17 @@
+{% load rest_framework %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="/trainers/save/" method="POST" novalidate>
+    {% csrf_token %}
+    {% render_form serializer %}
+    <input type="submit" value="Save">
+</form>
+
+</body>
+</html>
