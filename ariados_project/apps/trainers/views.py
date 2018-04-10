@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from ariados.models import Trainer
 from .serializers import TrainerSerializer, TrainerUserSerializer
 
-from apps.authentication.serializers import UserSerializer
-
 
 # Create your views here.
 @api_view(['GET'])
