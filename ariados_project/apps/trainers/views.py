@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ariados.models import Trainer
@@ -8,6 +9,7 @@ from .serializers import TrainerSerializer, TrainerUserSerializer
 
 # Create your views here.
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def get_trainer(request, id):
     try:
         serializer = TrainerSerializer(Trainer.objects.get(id=id))
@@ -17,6 +19,7 @@ def get_trainer(request, id):
 
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def filter_trainers(request):
     try:
         params = request.GET
@@ -32,6 +35,7 @@ def show_test(request):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def save_trainer(request):
     try:
         serializer = TrainerUserSerializer(data=request.POST)

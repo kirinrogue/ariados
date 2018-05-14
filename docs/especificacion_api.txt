@@ -1,0 +1,22 @@
+Autenticación:
+
+El sistema que se ha usado para este caso ha sido autenticación mediante django-rest-auth
+En síntesis el sistema funciona de la siguiente forma:
+
+    1) Usuario se autentica con usuario:contraseña
+    2) Usuario recibe token
+    3) Usuario accede a URL mandando el token en la cabecera de la petición. (Authorization)
+
+Ejemplos del uso de rest-auth:
+
+Con CURL sería: 
+
+Obtenemos el token:
+
+    curl -X POST -d "username=usuario&password=contraseña" http://localhost:8000/auth/login/
+            
+
+Obtenido el token, procedemos a realizar una petición:
+
+    curl -H "Authorization: Token <TOKEN>" -d "campos_formulario"  -H "multipart/form-data" -X POST http://localhost:80001/trainers/save
+            
