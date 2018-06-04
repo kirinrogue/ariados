@@ -22,7 +22,8 @@ def get_trainer(request, id):
 @permission_classes((IsAuthenticated,))
 def filter_trainers(request):
     try:
-        params = request.GET
+        params = {}
+        params.update(request.GET.items())
         serializer = TrainerSerializer(Trainer.objects.filter(**params), many=True)
     except Exception as e:
         return Response({'error': str(e)})
