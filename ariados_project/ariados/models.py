@@ -38,6 +38,7 @@ class FriendRequest(models.Model):
     class Meta:
         managed = True
         db_table = 'friend_request'
+        unique_together = ('trainer_from', 'trainer_to')
 
 
 class IsFriendOf(models.Model):

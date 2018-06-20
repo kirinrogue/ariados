@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^filter/', views.filter_trainers),
     url(r'^test/', views.show_test),
     url(r'^save/', views.save_trainer),
+    url(r'^send_friend_request/', views.send_friend_request),
 ]
