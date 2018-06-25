@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -11,12 +12,14 @@ from .serializers import TrainerSerializer, TrainerUserSerializer, FriendRequest
 # Create your views here.
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
-def get_trainer(request, id):
+def get_trainer(request):
+    id = request.GET.get('id', '')
+    name = request.GET.get('name', '')
     try:
         if id:
             serializer = TrainerSerializer(Trainer.objects.get(id=id))
         else:
-            serializer = TrainerSerializer(Trainer.objects.get(name=request.GET.get('name', '')))
+            serializer = TrainerSerializer(Trainer.objects.get(name=name))
     except Exception as e:
         return Response({'error': str(e)})
     return Response(serializer.data)
@@ -113,3 +116,25 @@ def reject_friend_request_from(request):
     except Exception as e:
         return Response({'error': str(e)})
     return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def get_friends(request):
+    params = {}
+    params.update(request.GET.items())
+    try:
+        trainer = Trainer.objects.get(user=request.user)
+        friend_list = list(IsFriendOf.objects.filter(Q(trainer1=trainer) | Q(trainer2=trainer)).values_list('trainer1',
+                                                                                                            flat=True))
+        friend_list.extend(
+            list(IsFriendOf.objects.filter(Q(trainer1=trainer) | Q(trainer2=trainer)).values_list('trainer2',
+                                                                                                  flat=True)))
+        if params:
+            trainers = Trainer.objects.filter(id__in=friend_list, **params).exclude(id=trainer.id)
+        else:
+            trainers = Trainer.objects.filter(id__in=friend_list).exclude(id=trainer.id)
+        serializer = TrainerSerializer(trainers, many=True)
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(serializer.data)
