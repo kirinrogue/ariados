@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from apps.authentication.serializers import UserSerializer
-from ariados.models import Trainer
+from ariados.models import Trainer, FriendRequest
 
 
 class TrainerSerializer(serializers.ModelSerializer):
@@ -25,3 +25,12 @@ class TrainerUserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**user_data)
         trainer = Trainer.objects.create(user=user, **validated_data)
         return trainer
+
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FriendRequest
+        exclude = []
+
+    trainer_from = TrainerSerializer()
+    trainer_to = TrainerSerializer()

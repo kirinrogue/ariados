@@ -1,10 +1,11 @@
+from django.db import transaction
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from ariados.models import Trainer, FriendRequest
-from .serializers import TrainerSerializer, TrainerUserSerializer
+from ariados.models import Trainer, FriendRequest, IsFriendOf
+from .serializers import TrainerSerializer, TrainerUserSerializer, FriendRequestSerializer
 
 
 # Create your views here.
@@ -63,6 +64,52 @@ def send_friend_request(request):
         else:
             FriendRequest.objects.create(trainer_from=trainer, trainer_to=trainer_to, status='SENT')
             response = {'success': 'Friend request sent!'}
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def get_friend_requests(request):
+    try:
+        trainer = Trainer.objects.get(user=request.user)
+        frs = FriendRequest.objects.filter(trainer_to=trainer, status='SENT')
+        serializer = FriendRequestSerializer(frs, many=True)
+        # response = {'success': 'Friend request sent!'}
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def accept_friend_request_from(request):
+    trainer_from_name = request.GET.get('trainer_name', '')
+    try:
+        with transaction.atomic():
+            trainer = Trainer.objects.get(user=request.user)
+            trainer_from = Trainer.objects.get(name=trainer_from_name)
+            FriendRequest.objects.filter(trainer_to=trainer, trainer_from=trainer_from, status='SENT').update(
+                status='ACCEPTED')
+            IsFriendOf.objects.create(trainer1=trainer, trainer2=trainer_from)
+        response = {'success': 'Friend request accepted!'}
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def reject_friend_request_from(request):
+    trainer_from_name = request.GET.get('trainer_name', '')
+    try:
+        with transaction.atomic():
+            trainer = Trainer.objects.get(user=request.user)
+            trainer_from = Trainer.objects.get(name=trainer_from_name)
+            FriendRequest.objects.filter(trainer_to=trainer, trainer_from=trainer_from, status='SENT').update(
+                status='REJECTED')
+        response = {'success': 'Friend request rejected!'}
     except Exception as e:
         return Response({'error': str(e)})
     return Response(response)

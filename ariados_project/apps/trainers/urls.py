@@ -8,4 +8,7 @@ urlpatterns = [
     url(r'^test/', views.show_test),
     url(r'^save/', views.save_trainer),
     url(r'^send_friend_request/', views.send_friend_request),
+    url(r'^get_friend_requests/', views.get_friend_requests),
+    url(r'^accept_friend_request_from/', views.accept_friend_request_from),
+    url(r'^reject_friend_request_from/', views.reject_friend_request_from),
 ]

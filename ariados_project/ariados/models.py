@@ -48,6 +48,7 @@ class IsFriendOf(models.Model):
     class Meta:
         managed = True
         db_table = 'is_friend_of'
+        unique_together = ('trainer1', 'trainer2')
 
 
 class Event(models.Model):
