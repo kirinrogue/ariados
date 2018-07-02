@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^accept_friend_request_from/', views.accept_friend_request_from),
     url(r'^reject_friend_request_from/', views.reject_friend_request_from),
     url(r'^get_friends/', views.get_friends),
+    url(r'^update_location/', views.update_location),
 ]

@@ -138,3 +138,17 @@ def get_friends(request):
     except Exception as e:
         return Response({'error': str(e)})
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def update_location(request):
+    lat = request.GET.get('lat', 0.0)
+    lng = request.GET.get('lng', 0.0)
+    try:
+        Trainer.objects.filter(user=request.user).update(current_location='{0},{1}'.format(lat, lng))
+
+        response = {'success': 'Updated!'}
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(response)
