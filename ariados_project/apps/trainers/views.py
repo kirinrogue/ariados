@@ -5,7 +5,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
+from ariados import settings
 from ariados.models import Trainer, FriendRequest, IsFriendOf
+from . import utiles
 from .serializers import TrainerSerializer, TrainerUserSerializer, FriendRequestSerializer
 
 
@@ -152,3 +154,34 @@ def update_location(request):
     except Exception as e:
         return Response({'error': str(e)})
     return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def get_closest_trainers(request):
+    try:
+        trainer = Trainer.objects.get(user=request.user)
+        if trainer.current_location:
+            center = trainer.current_location
+            lat1 = center.latitude
+            lon1 = center.longitude
+        else:
+            raise Exception('No location provided!')
+
+        in_range = list(Trainer.objects.none())
+        # Iteramos sobre todos los Trainers, excluyendo a si mismo
+        for t in Trainer.objects.all().exclude(pk=trainer.pk):
+            if t.current_location:
+                location = trainer.current_location
+                lat2 = location.latitude
+                lon2 = location.longitude
+                # añadimos al resultado el Trainer que esté dentro del radio de búsqueda, con la distancia calculada
+                # mediante la fórmula del haversine (semiverseno)
+                if utiles.haversine(lat1, lon1, lat2, lon2) <= settings.RADIO:
+                    # está dentro del rango
+                    in_range.append(t)
+
+        serializer = TrainerSerializer(in_range, many=True)
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(serializer.data)
