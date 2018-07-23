@@ -4,8 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from ariados.models import Trainer, IsFriendOf, Post, Vote
-from .serializers import PostSerializer, \
-    EditPostSerializer
+from .serializers import PostSerializer, EditPostSerializer
 
 
 # Create your views here.
@@ -13,8 +12,12 @@ from .serializers import PostSerializer, \
 @permission_classes((IsAuthenticated,))
 def get_post(request):
     id = request.GET.get('id', '')
+    title = request.GET.get('title', '')
     try:
-        serializer = PostSerializer(Post.objects.get(id=id))
+        if id:
+            serializer = PostSerializer(Post.objects.get(id=id))
+        else:
+            serializer = PostSerializer(Post.objects.get(title=title))
     except Exception as e:
         return Response({'error': str(e)})
     return Response(serializer.data)
@@ -33,7 +36,8 @@ def filter_posts(request):
                                                                                                   flat=True)))
         params = {}
         params.update(request.GET.items())
-        posts = Post.objects.filter(Q(viewers=team) | Q(viewers='GLOBAL'), creator__id__in=friend_list, **params)
+        posts = Post.objects.filter(Q(viewers=team) | Q(viewers='GLOBAL'), creator__id__in=friend_list,
+                                    answer_of__isnull=True, **params)
 
         serializer = PostSerializer(posts, many=True)
     except Exception as e:

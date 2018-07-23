@@ -73,7 +73,7 @@ class Attends(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, unique=True)
     text = models.TextField(max_length=500)
     VIEWERS_CHOICES = (
         ('INSTINCT', 'INSTINCT'),

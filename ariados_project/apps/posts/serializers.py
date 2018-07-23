@@ -1,15 +1,14 @@
 from rest_framework import serializers
 
-from apps.trainers.serializers import TrainerSerializer
 from ariados.models import Trainer, Post
 
 
 class PostSerializer(serializers.ModelSerializer):
+    creator_name = serializers.CharField(source='creator.name')
+
     class Meta:
         model = Post
-        fields = ('id', 'title', 'text', 'viewers', 'status', 'creator__name', 'answer_of', 'last_update')
-
-    creator = TrainerSerializer(required=True)
+        fields = ('id', 'title', 'text', 'viewers', 'status', 'creator_name', 'answer_of', 'last_update')
 
 
 class EditPostSerializer(serializers.ModelSerializer):
