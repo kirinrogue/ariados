@@ -106,6 +106,7 @@ class Vote(models.Model):
         ('LIKE', 'LIKE'),
         ('DISLIKE', 'DISLIKE'),
     )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=False, null=False, default='LIKE')
 
     class Meta:
         managed = True
