@@ -1,13 +1,10 @@
-from django.db import transaction
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from ariados import settings
-from ariados.models import Trainer, FriendRequest, IsFriendOf, Post, Vote
-from . import utiles
-from .serializers import TrainerSerializer, PostSerializer, \
+from ariados.models import Trainer, IsFriendOf, Post, Vote
+from .serializers import PostSerializer, \
     EditPostSerializer
 
 
@@ -27,9 +24,33 @@ def get_post(request):
 @permission_classes((IsAuthenticated,))
 def filter_posts(request):
     try:
+        trainer = Trainer.objects.get(user=request.user)
+        team = trainer.team
+        friend_list = list(IsFriendOf.objects.filter(Q(trainer1=trainer) | Q(trainer2=trainer)).values_list('trainer1',
+                                                                                                            flat=True))
+        friend_list.extend(
+            list(IsFriendOf.objects.filter(Q(trainer1=trainer) | Q(trainer2=trainer)).values_list('trainer2',
+                                                                                                  flat=True)))
         params = {}
         params.update(request.GET.items())
-        serializer = PostSerializer(Post.objects.filter(**params), many=True)
+        posts = Post.objects.filter(Q(viewers=team) | Q(viewers='GLOBAL'), creator__id__in=friend_list, **params)
+
+        serializer = PostSerializer(posts, many=True)
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def filter_my_posts(request):
+    try:
+        trainer = Trainer.objects.get(user=request.user)
+        params = {}
+        params.update(request.GET.items())
+        posts = Post.objects.filter(creator=trainer, **params)
+
+        serializer = PostSerializer(posts, many=True)
     except Exception as e:
         return Response({'error': str(e)})
     return Response(serializer.data)

@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     url(r'^get/', views.get_post),
-    url(r'^filter/', views.filter_trainers),
-    url(r'^save/', views.save_trainer),
+    url(r'^filter/', views.filter_posts),
+    url(r'^my/', views.filter_my_posts),
+    url(r'^save/', views.save_post),
 ]

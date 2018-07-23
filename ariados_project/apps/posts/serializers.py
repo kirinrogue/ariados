@@ -7,7 +7,7 @@ from ariados.models import Trainer, Post
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('id', 'title', 'text', 'viewers', 'status', 'creator', 'answer_of', 'last_update')
+        fields = ('id', 'title', 'text', 'viewers', 'status', 'creator__name', 'answer_of', 'last_update')
 
     creator = TrainerSerializer(required=True)
 
