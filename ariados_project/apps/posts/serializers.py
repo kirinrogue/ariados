@@ -21,3 +21,4 @@ class EditPostSerializer(serializers.ModelSerializer):
         post, created = Post.objects.update_or_create(id=validated_data.pop('id'),
                                                       defaults={'trainer': trainer, **validated_data})
         return post
+1

@@ -97,6 +97,7 @@ class Post(models.Model):
     class Meta:
         managed = True
         db_table = 'post'
+        ordering = ('last_update', 'title')
 
 
 class Vote(models.Model):

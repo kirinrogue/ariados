@@ -47,6 +47,23 @@ def filter_posts(request):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
+def get_answers(request):
+    title = request.GET.get('title', '')
+    print(title)
+    try:
+        parent = Post.objects.get(title=title)
+        posts = Post.objects.filter(answer_of=parent)
+        print(title, parent, posts)
+
+        serializer = PostSerializer(posts, many=True)
+    except Exception as e:
+        print(e)
+        return Response({'error': str(e)})
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def filter_my_posts(request):
     try:
         trainer = Trainer.objects.get(user=request.user)
