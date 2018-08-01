@@ -1,4 +1,9 @@
+import re
+
+import requests
 from django.db.models import Q
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -120,3 +125,30 @@ def get_votes(request):
     except Exception as e:
         return Response({'error': str(e)})
     return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_pgo_events(request):
+    # actualizaciones:
+    # grid__item post-list__date-item : clase de los elementos fecha
+    # grid__item post-list__title : clases de los elementos <a> que contienen el título
+
+
+    # eventos:
+    # events-list__event__date__day : clase para los días (span)
+    # events-list__event__date__month : clase para el mes
+    # events-list__event__content (CONTENIDO, DIVIDIO POR TITULO Y TEXTO)
+    # events-list__event__title : clase para el título del evento
+    # events-list__event__body : cuerpo / descripción del evento
+
+    # renderizar template con jquery que imprimirá los valores que queremos,
+    # y luego obtenerlos
+    page = requests.get('https://pokemongolive.com/en/events/').content.decode('utf-8')
+
+    start = page.find('<section')
+    end = page.find('</section>')
+    content = page[start:end]
+
+    string = render_to_string('events.html', context={'content': content})
+    return HttpResponse(string)
