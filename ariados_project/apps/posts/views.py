@@ -144,9 +144,9 @@ def get_pgo_events(request):
 
     # renderizar template con jquery que imprimirá los valores que queremos,
     # y luego obtenerlos
-    page = requests.get('https://pokemongolive.com/en/events/').content.decode('utf-8')
+    page = requests.get('https://pokemon.gameinfo.io/es/events').content.decode('utf-8')
 
-    start = page.find('<section')
+    start = page.find('<section id="events">')
     end = page.find('</section>')
     content = page[start:end]
 
