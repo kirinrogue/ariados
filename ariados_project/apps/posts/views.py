@@ -1,15 +1,14 @@
-import re
-
-import requests
+import dryscrape
+from bs4 import BeautifulSoup
 from django.db.models import Q
-from django.http import HttpResponse
-from django.template.loader import render_to_string
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from ariados.models import Trainer, IsFriendOf, Post, Vote
+from ariados.models import Trainer, IsFriendOf, Post, Vote, Event
 from .serializers import PostSerializer, EditPostSerializer
+
+from django.http import HttpResponse
 
 
 # Create your views here.
@@ -127,28 +126,31 @@ def get_votes(request):
     return Response(response)
 
 
+# View que será llamada periódicamente para crear los eventos necesarios automáticamente a través de la web
+# oficial de Pokémon GO! mediante web scrapping , ya que no disponemos de API oficial.
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def get_pgo_events(request):
-    # actualizaciones:
-    # grid__item post-list__date-item : clase de los elementos fecha
-    # grid__item post-list__title : clases de los elementos <a> que contienen el título
-
-
     # eventos:
     # events-list__event__date__day : clase para los días (span)
     # events-list__event__date__month : clase para el mes
     # events-list__event__content (CONTENIDO, DIVIDIO POR TITULO Y TEXTO)
     # events-list__event__title : clase para el título del evento
     # events-list__event__body : cuerpo / descripción del evento
+    sess = dryscrape.Session()
+    sess.visit('https://pokemongolive.com/en/events/')
+    body = sess.body()
 
-    # renderizar template con jquery que imprimirá los valores que queremos,
-    # y luego obtenerlos
-    page = requests.get('https://pokemon.gameinfo.io/es/events').content.decode('utf-8')
+    soup = BeautifulSoup(body)
+    dias = list(soup.find_all('span', class_='events-list__event__date__day'))
+    meses = list(soup.find_all('span', class_='events-list__event__date__month'))
+    titulos = list(soup.find_all('div', class_='events-list__event__title'))
+    descripciones = list(soup.find_all('div', class_='events-list__event__body'))
 
-    start = page.find('<section id="events">')
-    end = page.find('</section>')
-    content = page[start:end]
+    if dias and meses and titulos and descripciones:
+        for i in range(5):
+            if not Event.objects.filter(title=titulos[i].text).exists():
+                Event.objects.create(title=titulos[i].text, description=descripciones[i].text,
+                                     days=dias[i].text + meses[i].text)
 
-    string = render_to_string('events.html', context={'content': content})
-    return HttpResponse(string)
+    return HttpResponse('Got them!')

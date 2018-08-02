@@ -7,17 +7,11 @@
 </head>
 <body>
 
-    <div id="events_original" style="display:none;">
+    <div id="events_original" style="display:block;">
         {% autoescape off %}{{ content }}{% endautoescape %}
     </div>
 
     <div id="data_scrapped">
     </div>
-    <script>
-
-    </script>
-    <script>
-    $("#data_scrapped").append($(".events upcoming"));
-    </script>
 </body>
 </html>

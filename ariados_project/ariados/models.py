@@ -52,15 +52,14 @@ class IsFriendOf(models.Model):
 
 
 class Event(models.Model):
-    title = models.CharField(max_length=100, default='', blank=False, null=False)
-    description = models.CharField(max_length=100, default='', null=False)
-    location = GeopositionField()
-    start_date = models.DateTimeField(default=datetime.now, blank=False, null=False)
-    end_date = models.DateTimeField(default=datetime.now, blank=False, null=False)
+    title = models.CharField(max_length=252, default='', blank=False, null=False)
+    description = models.TextField(default='', null=False)
+    days = models.CharField(max_length=50, default='', null=False)
 
     class Meta:
         managed = True
         db_table = 'event'
+        ordering = ('days', 'title')
 
 
 class Attends(models.Model):
