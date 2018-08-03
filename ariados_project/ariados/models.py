@@ -60,6 +60,7 @@ class Event(models.Model):
         managed = True
         db_table = 'event'
         ordering = ('days', 'title')
+        unique_together = ('title', 'days')
 
 
 class Attends(models.Model):
