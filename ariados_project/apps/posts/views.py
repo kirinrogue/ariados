@@ -1,4 +1,5 @@
 import dryscrape
+import json
 from bs4 import BeautifulSoup
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
@@ -96,11 +97,11 @@ def save_post(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def vote_post(request):
-    post_id = request.GET.get('post_id', '')
+    post_title = request.GET.get('title', '')
     type = request.GET.get('type', '')
     try:
         trainer = Trainer.objects.get(user=request.user)
-        post = Post.objects.get(id=post_id)
+        post = Post.objects.get(title=post_title)
         if Vote.objects.filter(trainer=trainer, post=post).exists():
             Vote.objects.filter(trainer=trainer, post=post).update(type=type)
             response = {'error': 'Vote changed!'}
@@ -115,12 +116,25 @@ def vote_post(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def get_votes(request):
-    post_id = request.GET.get('post_id', '')
+    post_title = request.GET.get('title', '')
     try:
-        post = Post.objects.get(id=post_id)
+        post = Post.objects.get(title=post_title)
         likes = Vote.objects.filter(post=post, type='LIKE')
         dislikes = Vote.objects.filter(post=post, type='DISLIKE')
         response = {'LIKES': likes.count(), 'DISLIKES': dislikes.count()}
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def is_author(request):
+    post_title = request.GET.get('title', '')
+    try:
+        post = Post.objects.get(title=post_title)
+        is_author = 1 if post.creator == Trainer.objects.get(user=request.user) else 0
+        response = {'is_author': is_author}
     except Exception as e:
         return Response({'error': str(e)})
     return Response(response)

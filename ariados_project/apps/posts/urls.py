@@ -8,4 +8,7 @@ urlpatterns = [
     url(r'^my/', views.filter_my_posts),
     url(r'^answers/', views.get_answers),
     url(r'^save/', views.save_post),
+    url(r'^votes/', views.get_votes),
+    url(r'^vote/', views.vote_post),
+    url(r'^is_author/', views.is_author),
 ]

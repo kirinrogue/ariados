@@ -24,7 +24,7 @@ def get_pgo_events(request):
     sess.visit('https://pokemongolive.com/en/events/')
     body = sess.body()
 
-    soup = BeautifulSoup(body)
+    soup = BeautifulSoup(body, features="lxml")
     dias = list(soup.find_all('span', class_='events-list__event__date__day'))
     meses = list(soup.find_all('span', class_='events-list__event__date__month'))
     titulos = list(soup.find_all('div', class_='events-list__event__title'))
