@@ -1,15 +1,12 @@
-import dryscrape
-import json
-from bs4 import BeautifulSoup
+from datetime import datetime
+
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ariados.models import Trainer, IsFriendOf, Post, Vote, Event
+from ariados.models import Trainer, IsFriendOf, Post, Vote
 from .serializers import PostSerializer, EditPostSerializer
-
-from django.http import HttpResponse
 
 
 # Create your views here.
@@ -80,7 +77,31 @@ def filter_my_posts(request):
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
+def update_post(request):
+    try:
+        Post.objects.filter(title=request.POST.get('title', '')).update(text=request.POST.get('text', ''),
+                                                                        last_update=datetime.now)
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response({'success': 'Updated!'})
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def save_post(request):
+    try:
+        parent = Post.object.get(title=request.POST.get('parent_title'))
+        Post.objects.create(title=request.POST.get('title', ''), text=request.POST.get('text', ''), answer_of=parent,
+                            status=parent.status, creator=Trainer.objects.get(user=request.user),
+                            viewers=parent.viewers)
+    except Exception as e:
+        return Response({'error': str(e)})
+    return Response({'success': 'Successfully answered!'})
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def answer_post(request):
     try:
         serializer = EditPostSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
