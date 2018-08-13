@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ariados.models import Trainer, IsFriendOf, Post, Vote
-from .serializers import PostSerializer, EditPostSerializer
+from .serializers import PostSerializer
 
 
 # Create your views here.
@@ -78,17 +78,19 @@ def filter_my_posts(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def update_post(request):
+    print(request.POST)
     try:
         Post.objects.filter(title=request.POST.get('title', '')).update(text=request.POST.get('text', ''),
-                                                                        last_update=datetime.now)
+                                                                        last_update=datetime.now())
     except Exception as e:
+        print(e)
         return Response({'error': str(e)})
     return Response({'success': 'Updated!'})
 
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
-def save_post(request):
+def answer_post(request):
     try:
         parent = Post.object.get(title=request.POST.get('parent_title'))
         Post.objects.create(title=request.POST.get('title', ''), text=request.POST.get('text', ''), answer_of=parent,
@@ -101,11 +103,12 @@ def save_post(request):
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
-def answer_post(request):
+def create_post(request):
     try:
-        serializer = EditPostSerializer(data=request.POST)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(request=request, validated_data=serializer.validated_data)
+        parent = Post.object.get(title=request.POST.get('parent_title'))
+        Post.objects.create(title=request.POST.get('title', ''), text=request.POST.get('text', ''), answer_of=None,
+                            status='OPEN', creator=Trainer.objects.get(user=request.user),
+                            viewers=request.POST.get('viewers', 'GLOBAL'))
     except Exception as e:
         return Response({'error': str(e)})
     return Response(serializer.data)

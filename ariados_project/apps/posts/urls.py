@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^my/', views.filter_my_posts),
     url(r'^answers/', views.get_answers),
     url(r'^delete/', views.delete_post),
+    url(r'^create/', views.create_post),
     url(r'^update/', views.update_post),
     url(r'^answer/', views.answer_post),
     url(r'^votes/', views.get_votes),
