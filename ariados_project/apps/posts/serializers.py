@@ -10,6 +10,8 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('id', 'title', 'text', 'viewers', 'status', 'creator_name', 'answer_of', 'last_update')
 
+    last_update = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
 
 class EditPostSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,4 +23,6 @@ class EditPostSerializer(serializers.ModelSerializer):
         post, created = Post.objects.update_or_create(id=validated_data.pop('id'),
                                                       defaults={'trainer': trainer, **validated_data})
         return post
+
+
 1

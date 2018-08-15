@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from ariados.models import Trainer, IsFriendOf, Post, Vote
 from .serializers import PostSerializer
+from . import utiles
 
 
 # Create your views here.
@@ -38,7 +39,8 @@ def filter_posts(request):
                                                                                                   flat=True)))
         params = {}
         params.update(request.GET.items())
-        posts = Post.objects.filter(Q(viewers=team) | Q(viewers='GLOBAL'), creator__id__in=friend_list,
+        posts = Post.objects.filter(Q(viewers=team) | Q(viewers='GLOBAL') | Q(creator=trainer),
+                                    creator__id__in=friend_list,
                                     answer_of__isnull=True, **params)
 
         serializer = PostSerializer(posts, many=True)
@@ -78,12 +80,10 @@ def filter_my_posts(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def update_post(request):
-    print(request.POST)
     try:
         Post.objects.filter(title=request.POST.get('title', '')).update(text=request.POST.get('text', ''),
                                                                         last_update=datetime.now())
     except Exception as e:
-        print(e)
         return Response({'error': str(e)})
     return Response({'success': 'Updated!'})
 
@@ -92,11 +92,12 @@ def update_post(request):
 @permission_classes((IsAuthenticated,))
 def answer_post(request):
     try:
-        parent = Post.object.get(title=request.POST.get('parent_title'))
-        Post.objects.create(title=request.POST.get('title', ''), text=request.POST.get('text', ''), answer_of=parent,
+        parent = Post.objects.get(title=request.POST.get('parent_title'))
+        Post.objects.create(title=utiles.generate_answer_title(request.POST.get('parent_tittle')), text=request.POST.get('text', ''), answer_of=parent,
                             status=parent.status, creator=Trainer.objects.get(user=request.user),
                             viewers=parent.viewers)
     except Exception as e:
+        print(e)
         return Response({'error': str(e)})
     return Response({'success': 'Successfully answered!'})
 
@@ -105,13 +106,12 @@ def answer_post(request):
 @permission_classes((IsAuthenticated,))
 def create_post(request):
     try:
-        parent = Post.object.get(title=request.POST.get('parent_title'))
         Post.objects.create(title=request.POST.get('title', ''), text=request.POST.get('text', ''), answer_of=None,
                             status='OPEN', creator=Trainer.objects.get(user=request.user),
                             viewers=request.POST.get('viewers', 'GLOBAL'))
     except Exception as e:
         return Response({'error': str(e)})
-    return Response(serializer.data)
+    return Response({'success': 'Created successfully!'})
 
 
 @api_view(['GET'])
