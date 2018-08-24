@@ -6,10 +6,9 @@ Disclaimer:
 
 Tecnologías:
 
-    · Server side:
-        * Python 3.6
-        * Django 1.11.5
-            * djangorestframework v3
-            * beautifulsoup
-            * dryscrape
-            * django-geoposition
+    * Python 3.6
+    * Django 1.11.5
+        * djangorestframework v3
+        * beautifulsoup
+        * dryscrape
+        * django-geoposition
