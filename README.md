@@ -10,6 +10,6 @@ Tecnologías:
         * Python 3.6
         * Django 1.11.5
             * djangorestframework v3
-
-
-Especificación de la API:
+            * beautifulsoul
+            * dryscrape
+            * django-geoposition

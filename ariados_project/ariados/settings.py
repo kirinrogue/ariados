@@ -22,7 +22,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_v32^d-x&57(+=z2ccn12qy(y)yft=j!-mwfk@apb$lz^5_(8%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+if DEBUG:
+    DB_HOST = 'localhost'
+else:
+    DB_HOST = '18.184.235.13'
 
 ALLOWED_HOSTS = ['*']
 
@@ -82,7 +87,7 @@ DATABASES = {
         'NAME': 'ariados',
         'USER': 'root',
         'PASSWORD': 'toor',
-        'HOST': 'localhost',  # Or an IP Address that your DB is hosted on
+        'HOST': DB_HOST,  # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }
