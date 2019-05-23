@@ -4,7 +4,7 @@ chardet==3.0.4
 Django==1.11.8
 django-geoposition==0.3.0
 django-rest-auth==0.9.3
-djangorestframework==3.7.3
+djangorestframework==3.9.1
 dryscrape==1.0
 idna==2.7
 lxml==4.2.3
